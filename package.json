@@ -1,0 +1,33 @@
+{
+  "name": "online-store",
+  "version": "1.0.0",
+  "description": "pnf papers backend ecommerce API's",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farukh110/pnf-papers-backend.git"
+  },
+  "keywords": [
+    "sale",
+    "online",
+    "papers"
+  ],
+  "author": "farukh sajjad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/farukh110/pnf-papers-backend/issues"
+  },
+  "homepage": "https://github.com/farukh110/pnf-papers-backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "nodemon": "^3.1.3"
+  }
+}
