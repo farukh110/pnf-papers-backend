@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser } = require('../controllers/user');
+const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout } = require('../controllers/user');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -11,6 +11,12 @@ router.post('/login', loginUser);
 
 // get all users
 router.get('/users', getAllUsers);
+
+// refresh token
+router.get('/refresh', handleRefreshToken);
+
+// logout
+router.get('/logout', logout);
 
 // get single user
 router.get('/:id', authMiddleware, isAdmin, getUser);

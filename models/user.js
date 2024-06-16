@@ -39,6 +39,9 @@ const userSchema = Schema({
     },
     address: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     wishlist: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+    refreshToken: {
+        type: String
+    }
 
 }, {
     timestamps: true
