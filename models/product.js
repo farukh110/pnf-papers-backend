@@ -22,28 +22,42 @@ const productSchema = Schema({
         type: Number,
         required: true
     },
+    // category: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Category"
+    // },
     category: {
-        type: Schema.Types.ObjectId,
-        ref: "Category"
+        type: String,
+        required: true
     },
+    // brand: {
+    //     type: String,
+    //     enum: ["Venial Paper", "Frosted Paper", "Panaflex Paper"]
+    // },
     brand: {
         type: String,
-        enum: ["Venial Paper", "Frosted Paper", "Panaflex Paper"]
+        required: true
     },
     sold: {
         type: Number,
-        default: 0
+        default: 0,
+        // select: false
     },
     quantity: {
         type: Number,
-        required: true
+        required: true,
+        // select: false
     },
     images: {
         type: Array
     },
+    // color: {
+    //     type: String,
+    //     enum: ["#A3A3A5", "#C1C1C3", "#787578"]
+    // },
     color: {
         type: String,
-        enum: ["#A3A3A5", "#C1C1C3", "#787578"]
+        required: true
     },
     ratings: [
         {
