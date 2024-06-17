@@ -108,9 +108,18 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
         console.log('query obj: ', queryObj, excludeFields);
 
-        const allProducts = await Product.where("category").equals(
-            req.query.category
-        );
+        // const allProducts = await Product.where("category").equals(
+        //     req.query.category
+        // );
+
+        console.log('queryObj ---------> ', queryObj);
+
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+        console.log('queryStr: ', JSON.parse(queryStr));
+
+        const allProducts = await Product.find(queryObj);
 
         res.json(allProducts);
 
