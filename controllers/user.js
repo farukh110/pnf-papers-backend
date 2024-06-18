@@ -4,6 +4,7 @@ const asyncHandler = require('express-async-handler');
 const { validateMongoDBId } = require('../utilities/validateMongoDBId');
 const { generateRefreshToken } = require('../config/refreshToken');
 const jwt = require('jsonwebtoken');
+const { sendEmail } = require('./email');
 
 // create new user
 
@@ -304,4 +305,72 @@ const unblockUser = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout };
+// update password
+
+const updatePassword = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+        const { password } = req.body;
+
+        validateMongoDBId(_id);
+
+        const user = await User.findById(_id);
+
+        if (password) {
+
+            user.password = password;
+            const updatedPassword = await user.save();
+            res.json(updatedPassword);
+
+        } else {
+
+            res.json(user);
+        }
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// forgot password
+
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) throw new Error("User not found with this email");
+
+    try {
+
+        const token = await user.createPasswordResetToken();
+
+        await user.save();
+
+        const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. 
+        <a href='http://localhost:5000/api/user/reset-password/${token}'> click here </a>`;
+
+        const data = {
+
+            to: email,
+            text: "Hi User",
+            subject: "Forgot Password Link",
+            html: resetURL
+        };
+
+        sendEmail(data);
+
+        res.json(token);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken };
