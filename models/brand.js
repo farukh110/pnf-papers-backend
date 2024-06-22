@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const blogCategorySchema = Schema({
+const brandSchema = Schema({
 
     title: {
         type: String,
@@ -9,9 +9,6 @@ const blogCategorySchema = Schema({
         unique: true,
         index: true
     }
+}, { timestamps: true });
 
-}, {
-    timestamps: true
-});
-
-module.exports = mongoose.model('BlogCategories', blogCategorySchema);
+module.exports = mongoose.model('Brand', brandSchema);

@@ -27,15 +27,33 @@ const updateBlogCategory = asyncHandler(async (req, res) => {
 
         const { id } = req.params;
 
+        console.log('Received ID:', id);
+
         validateMongoDBId(id);
 
-        const updateBlogCategory = await BlogCategory.findByIdAndUpdate(id, req.body, { new: true });
+        // Check if the document exists
+        const existingCategory = await BlogCategory.findById(id);
+        if (!existingCategory) {
+            res.status(404).json({ message: 'Blog Category not found' });
+            return;
+        }
 
-        res.json(updateBlogCategory);
+        const updatedBlogCategory = await BlogCategory.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true, runValidators: true } // Ensure new document is returned and validators are run
+        );
 
+        // If the update operation failed
+        if (!updatedBlogCategory) {
+            res.status(500).json({ message: 'Failed to update Blog Category' });
+            return;
+        }
+
+        res.json(updatedBlogCategory);
     } catch (error) {
-
-        throw new Error(error);
+        console.error('Error updating blog category:', error);
+        res.status(500).json({ message: error.message });
     }
 });
 
