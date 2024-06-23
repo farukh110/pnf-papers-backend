@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addToWishList, productRating } = require('../controllers/product');
+const { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addToWishList, productRating, uploadImages } = require('../controllers/product');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
+const { uploadPhoto, productImageResize } = require('../middlewares/uploadImages');
 
 // create product
 
 router.post('/', authMiddleware, isAdmin, createProduct);
+
+// upload product images
+
+router.put('/upload', authMiddleware, isAdmin, uploadPhoto.array("images", 10), productImageResize, uploadImages);
 
 // get single product
 
