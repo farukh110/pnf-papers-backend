@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
+const fs = require('fs');
 
 // multer storage
 
@@ -22,7 +23,10 @@ const multerStorage = multer.diskStorage({
 
 const multerFilter = (req, file, cb) => {
 
-    if (file.mimeType.startsWith('image')) {
+    console.log('file: ', file);
+    console.log('file.mimeType: ', file.mimetype);
+
+    if (file.mimetype.startsWith('image')) {
 
         cb(null, true);
 
@@ -54,11 +58,13 @@ const productImageResize = async (req, res, next) => {
 
         await sharp(file.path).resize(300, 300).toFormat("jpeg").jpeg({ quality: 95 }).toFile(`public/images/products/${file.filename}`);
 
+        fs.unlinkSync(`public/images/products/${file.filename}`);
+
     }));
     next();
 };
 
-// product resize
+// blog resize
 
 const blogImageResize = async (req, res, next) => {
 
@@ -68,6 +74,7 @@ const blogImageResize = async (req, res, next) => {
 
         await sharp(file.path).resize(300, 300).toFormat("jpeg").jpeg({ quality: 95 }).toFile(`public/images/blogs/${file.filename}`);
 
+        fs.unlinkSync(`public/images/blogs/${file.filename}`);
     }));
     next();
 };

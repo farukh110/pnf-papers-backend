@@ -2,6 +2,8 @@ const Product = require('../models/product');
 const asyncHandler = require('express-async-handler');
 const slugify = require('slugify');
 const User = require('../models/user');
+const { cloudinaryUploadImage } = require('../utilities/cloudinary');
+const fs = require('fs');
 
 // create product
 
@@ -308,7 +310,47 @@ const productRating = asyncHandler(async (req, res) => {
 
 const uploadImages = asyncHandler(async (req, res) => {
 
-    console.log('uploaded files: ', req.files);
+    // console.log('uploaded files: ', req.files);
+
+    try {
+
+        const { id } = req.params;
+
+        const uploader = (path) => cloudinaryUploadImage(path, "images");
+
+        const imagesUrls = [];
+
+        const imageFiles = req.files;
+
+        for (const item of imageFiles) {
+
+            const { path } = item;
+
+            const newPath = await uploader(path);
+
+            imagesUrls.push(newPath);
+
+            fs.unlinkSync(path);
+        }
+
+        const product = await Product.findByIdAndUpdate(id, {
+
+            images: imagesUrls.map((fileItem) => {
+
+                return fileItem;
+
+            })
+
+        }, {
+            new: true
+        });
+
+        res.json(product);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
 
 });
 

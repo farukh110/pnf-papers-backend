@@ -10,7 +10,7 @@ router.post('/', authMiddleware, isAdmin, createProduct);
 
 // upload product images
 
-router.put('/upload', authMiddleware, isAdmin, uploadPhoto.array("images", 10), productImageResize, uploadImages);
+router.put('/upload/:id', authMiddleware, isAdmin, uploadPhoto.array("images", 10), productImageResize, uploadImages);
 
 // get single product
 
