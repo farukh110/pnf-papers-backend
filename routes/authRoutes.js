@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress } = require('../controllers/user');
+const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon } = require('../controllers/user');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -11,6 +11,12 @@ router.post('/login', loginUser);
 
 // admin login
 router.post('/admin-login', adminLogin);
+
+// cart user
+router.post('/cart', authMiddleware, cartUser);
+
+// cart user
+router.post('/cart/apply-coupon', authMiddleware, applyCoupon);
 
 // update password
 router.put('/password', authMiddleware, updatePassword);
@@ -33,8 +39,14 @@ router.get('/logout', logout);
 // get wishlist
 router.get('/wishlist', authMiddleware, getWishList);
 
+// get user cart 
+router.get('/cart', authMiddleware, getUserCart);
+
 // get single user
 router.get('/:id', authMiddleware, isAdmin, getUser);
+
+// empty user cart
+router.delete('/empty-cart', authMiddleware, emptyUserCart);
 
 // delete single user
 router.delete('/:id', deleteUser);

@@ -1,5 +1,8 @@
 const { generateToken } = require('../config/jwtToken');
 const User = require('../models/user');
+const Product = require('../models/product');
+const Cart = require('../models/cart');
+const Coupon = require('../models/coupon');
 const asyncHandler = require('express-async-handler');
 const { validateMongoDBId } = require('../utilities/validateMongoDBId');
 const { generateRefreshToken } = require('../config/refreshToken');
@@ -470,7 +473,7 @@ const getWishList = asyncHandler(async (req, res) => {
 
 // save address
 
-const saveUserAddress = asyncHandler(async (req, res, next) => {
+const saveUserAddress = asyncHandler(async (req, res) => {
 
     try {
 
@@ -495,4 +498,157 @@ const saveUserAddress = asyncHandler(async (req, res, next) => {
 
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress };
+// add to cart
+
+const cartUser = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { cart } = req.body;
+        const { _id } = req.user;
+
+        validateMongoDBId(_id);
+
+        const user = await User.findById(_id);
+
+        const products = [];
+
+        const alreadyExistsCart = await Cart.findOne({ orderBy: user._id });
+
+        if (alreadyExistsCart) {
+            alreadyExistsCart.remove();
+        }
+
+        for (let i = 0; i < cart.length; i++) {
+
+            let object = {};
+
+            object.product = cart[i]._id;
+            object.count = cart[i].count;
+            object.color = cart[i].color;
+
+            let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+            object.price = getPrice.price;
+
+            products.push(object);
+
+        }
+
+        let cartTotal = 0;
+
+        for (let i = 0; i < products.length; i++) {
+
+            cartTotal = cartTotal + products[i].price * products[i].count;
+
+        }
+
+        console.log('products: ', products);
+
+        console.log(products, cartTotal);
+
+        let newCartItem = await new Cart({
+
+            products,
+            cartTotal,
+            orderBy: user?._id
+
+        }).save();
+
+        res.json(newCartItem);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// get user cart
+
+const getUserCart = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+        validateMongoDBId(_id);
+
+        const cart = await Cart.findOne({ orderBy: _id }).populate("products.product");
+
+        res.json(cart);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// empty cart user
+
+const emptyUserCart = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+
+        validateMongoDBId(_id);
+
+        const user = await User.findOne({ _id });
+
+        const cart = await Cart.findOneAndDelete({ orderBy: user._id });
+
+        res.json(cart);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// apply coupon
+
+const applyCoupon = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { coupon } = req.body;
+        const { _id } = req.user;
+
+        validateMongoDBId(_id);
+
+        const findValidCoupon = await Coupon.findOne({ name: coupon });
+
+        // console.log('findValidCoupon', findValidCoupon);
+
+        if (findValidCoupon === null) {
+
+            throw new Error("Invalid Coupon");
+        }
+
+        const user = await User.findOne({ _id });
+
+        let { products, cartTotal } = await Cart.findOne({
+
+            orderBy: user._id
+
+        }).populate("products.product");
+
+        let totalAfterDiscount = (cartTotal - (cartTotal * findValidCoupon.discount) / 100).toFixed(2);
+
+        await Cart.findOneAndUpdate(
+            { orderBy: user._id },
+            { totalAfterDiscount },
+            { new: true }
+        );
+
+        res.json(totalAfterDiscount);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon };
