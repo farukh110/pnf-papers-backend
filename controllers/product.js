@@ -314,7 +314,7 @@ const uploadImages = asyncHandler(async (req, res) => {
 
     try {
 
-        const { id } = req.params;
+        // const { id } = req.params;
 
         const uploader = (path) => cloudinaryUploadImage(path, "images");
 
@@ -333,19 +333,26 @@ const uploadImages = asyncHandler(async (req, res) => {
             fs.unlinkSync(path);
         }
 
-        const product = await Product.findByIdAndUpdate(id, {
+        const images = imagesUrls.map((fileItem) => {
 
-            images: imagesUrls.map((fileItem) => {
+            return fileItem;
 
-                return fileItem;
-
-            })
-
-        }, {
-            new: true
         });
 
-        res.json(product);
+        res.json(images);
+
+        // const product = await Product.findByIdAndUpdate(id, {
+
+        //     images: imagesUrls.map((fileItem) => {
+
+        //         return fileItem;
+
+        //     })
+
+        // }, {
+        //     new: true
+        // });
+
 
     } catch (error) {
 

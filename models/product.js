@@ -53,10 +53,12 @@ const productSchema = Schema({
     //     type: String,
     //     enum: ["#A3A3A5", "#C1C1C3", "#787578"]
     // },
-    color: {
-        type: String,
-        required: true
-    },
+    // color: {
+    //     type: String,
+    //     required: true
+    // },
+    color: [],
+    tags: [],
     ratings: [
         {
             star: Number,
@@ -67,8 +69,23 @@ const productSchema = Schema({
     totalRating: {
         type: String,
         default: 0
+    },
+    length: {
+        type: Number,
+        required: true
+    },
+    width: {
+        type: Number,
+        required: true
+    },
+    height: {
+        type: Number,
+        required: true
+    },
+    weight: {
+        type: Number,
+        required: true
     }
-
 }, {
     timestamps: true
 });
