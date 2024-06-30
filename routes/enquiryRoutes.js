@@ -1,6 +1,6 @@
 const express = require('express');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
-const { createEnquiry, updateEnquiry, deleteEnquiry, getAllEnqueries, getEnquiry } = require('../controllers/enquiry');
+const { createEnquiry, updateEnquiry, deleteEnquiry, getAllEnquiries, getEnquiry } = require('../controllers/enquiry');
 const router = express.Router();
 
 // create enquiry
@@ -17,7 +17,7 @@ router.delete('/:id', authMiddleware, isAdmin, deleteEnquiry);
 
 // get all enqueries
 
-router.get('/', getAllEnqueries);
+router.get('/', getAllEnquiries);
 
 // get enquiry by id
 

@@ -62,7 +62,7 @@ const deleteEnquiry = asyncHandler(async (req, res) => {
 
 // get all enqueries
 
-const getAllEnqueries = asyncHandler(async (req, res) => {
+const getAllEnquiries = asyncHandler(async (req, res) => {
 
     try {
 
@@ -96,4 +96,4 @@ const getEnquiry = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createEnquiry, updateEnquiry, deleteEnquiry, getAllEnqueries, getEnquiry };
+module.exports = { createEnquiry, updateEnquiry, deleteEnquiry, getAllEnquiries, getEnquiry };
