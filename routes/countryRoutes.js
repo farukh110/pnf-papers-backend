@@ -1,6 +1,6 @@
 const express = require('express');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
-const { createCountry, updateCountry, deleteCountry, getAllCountries } = require('../controllers/country');
+const { createCountry, updateCountry, deleteCountry, getAllCountries, getCountry } = require('../controllers/country');
 const router = express.Router();
 
 // create country
@@ -19,4 +19,9 @@ router.delete('/:id', authMiddleware, isAdmin, deleteCountry);
 
 router.get('/', getAllCountries);
 
+// get country by id
+
+router.get('/:id', getCountry);
+
+module.exports = router;
 
