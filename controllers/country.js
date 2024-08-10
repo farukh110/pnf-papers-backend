@@ -61,6 +61,20 @@ const deleteCountry = asyncHandler(async (req, res) => {
 
 // get all countries
 
+const getAllCountries = asyncHandler(async (req, res) => {
+
+    try {
+
+        const countries = await Country.find();
+
+        res.json(countries);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
+
 // get country
 
-module.exports = { createCountry, updateCountry, deleteCountry };
+module.exports = { createCountry, updateCountry, deleteCountry, getAllCountries };
