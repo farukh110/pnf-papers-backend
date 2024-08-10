@@ -40,8 +40,27 @@ const updateCountry = asyncHandler(async (req, res) => {
 
 // delete country
 
+const deleteCountry = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        validateMongoDBId(id);
+
+        const country = await Country.findByIdAndDelete(id);
+
+        res.json(country);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
 // get all countries
 
 // get country
 
-module.exports = { createCountry, updateCountry };
+module.exports = { createCountry, updateCountry, deleteCountry };
