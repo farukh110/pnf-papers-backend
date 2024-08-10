@@ -77,4 +77,22 @@ const getAllCountries = asyncHandler(async (req, res) => {
 
 // get country
 
-module.exports = { createCountry, updateCountry, deleteCountry, getAllCountries };
+const getCountry = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        validateMongoDBId(id);
+
+        const country = await Country.findById(id);
+
+        res.json(country);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
+
+module.exports = { createCountry, updateCountry, deleteCountry, getAllCountries, getCountry };
