@@ -16,6 +16,7 @@ const brandRouter = require('./routes/brandRoutes');
 const couponRouter = require('./routes/couponRoutes');
 const colorRouter = require('./routes/colorRoutes');
 const enquiryRouter = require('./routes/enquiryRoutes');
+const countrRouter = require('./routes/countryRoutes');
 
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -41,6 +42,7 @@ app.use('/api/brand', brandRouter);
 app.use('/api/coupon', couponRouter);
 app.use('/api/color', colorRouter);
 app.use('/api/enquiry', enquiryRouter);
+app.use('/api/country', countrRouter);
 
 app.use(notFound);
 app.use(errorHandler);
