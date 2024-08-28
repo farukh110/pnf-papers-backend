@@ -207,18 +207,28 @@ const logout = asyncHandler(async (req, res) => {
 // get all users
 
 const getAllUsers = asyncHandler(async (req, res) => {
-
-
     try {
+        const { page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
-        const users = await User.find();
-        res.json(users);
+        const skip = (page - 1) * limit;
+
+        const users = await User.find()
+            .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const totalRecords = await User.countDocuments();
+
+        res.json({
+            data: users,
+            totalRecords,
+            page: parseInt(page),
+            limit: parseInt(limit),
+        });
 
     } catch (error) {
-
         throw new Error(error);
     }
-
 });
 
 // get single user
