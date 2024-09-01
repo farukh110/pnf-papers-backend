@@ -208,26 +208,85 @@ const logout = asyncHandler(async (req, res) => {
 
 const getAllUsers = asyncHandler(async (req, res) => {
     try {
-        const { page = 1, limit = 50, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+        // Extract and validate query parameters
+        const page = Math.max(1, parseInt(req.query.page, 10)) || 1; // Ensure page is at least 1
+        const limit = Math.max(1, parseInt(req.query.limit, 10)) || 50; // Ensure limit is at least 1
+        const sortBy = req.query.sortBy || 'createdAt';
+        const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+
+        // Decode and parse filters
+        const filters = req.query.filters ? decodeURIComponent(req.query.filters) : '{}';
+        let parsedFilters = {};
+        try {
+            parsedFilters = JSON.parse(filters);
+        } catch (e) {
+            return res.status(400).json({ message: 'Invalid filters format' });
+        }
+
+        console.log('Filters Parameter:', req.query.filters);
+        console.log('Decoded Filters:', filters);
+        console.log('Parsed Filters Object:', parsedFilters);
 
         const skip = (page - 1) * limit;
 
-        const users = await User.find()
-            .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        // Initialize filter criteria
+        const filterCriteria = {};
+
+        for (const key in parsedFilters) {
+            if (Object.hasOwnProperty.call(parsedFilters, key)) {
+                const { value, matchMode } = parsedFilters[key];
+
+                if (value !== null && value !== '') {
+                    switch (matchMode) {
+                        case 'startsWith':
+                            filterCriteria[key] = { $regex: `^${value}`, $options: 'i' };
+                            break;
+                        case 'contains':
+                            filterCriteria[key] = { $regex: value, $options: 'i' };
+                            break;
+                        case 'equals':
+                            filterCriteria[key] = value;
+                            break;
+                        case 'notEquals':
+                            filterCriteria[key] = { $ne: value };
+                            break;
+                        case 'endsWith':
+                            filterCriteria[key] = { $regex: `${value}$`, $options: 'i' };
+                            break;
+                        default:
+                            console.warn(`Unsupported matchMode: ${matchMode}`);
+                            break;
+                    }
+                }
+            }
+        }
+
+        console.log('Filter Criteria Object:', filterCriteria);
+
+        // Fetch users with applied filters, sorting, and pagination
+        const users = await User.find(filterCriteria)
+            .select('-password -refreshToken')  // Exclude sensitive fields
+            .sort({ [sortBy]: sortOrder })
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limit)
+            .lean(); // Convert Mongoose documents to plain JavaScript objects
 
-        const totalRecords = await User.countDocuments();
+        console.log('Fetched Users:', users);
 
+        // Get the total number of records matching the filters
+        const totalRecords = await User.countDocuments(filterCriteria);
+
+        // Respond with the users data, total records, current page, and limit
         res.json({
             data: users,
             totalRecords,
-            page: parseInt(page),
-            limit: parseInt(limit),
+            page,
+            limit,
         });
 
     } catch (error) {
-        throw new Error(error);
+        console.error('Error fetching users:', error.message); // Enhanced error logging
+        res.status(500).json({ message: 'Server error, please try again later.' });
     }
 });
 
