@@ -90,97 +90,201 @@ const getProduct = asyncHandler(async (req, res) => {
 
 // get all products
 
+// const getAllProducts = asyncHandler(async (req, res) => {
+
+//     try {
+
+//         console.log('req.query: ', req.query);
+
+//         // const allProducts = await Product.find(req.query);
+
+//         // const allProducts = await Product.find({
+//         //     brand: req.query.brand,
+//         //     category: req.query.category
+//         // });
+
+//         const queryObj = { ...req.query };
+
+//         const excludeFields = ["page", "sort", "limit", "fields"];
+
+//         excludeFields.forEach((el) => delete queryObj[el]);
+
+//         console.log('query obj: ', queryObj, excludeFields);
+
+//         // const allProducts = await Product.where("category").equals(
+//         //     req.query.category
+//         // );
+
+//         console.log('queryObj ---------> ', queryObj);
+
+//         let queryStr = JSON.stringify(queryObj);
+//         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+//         // console.log('queryStr: ', JSON.parse(queryStr));
+
+//         let query = Product.find(JSON.parse(queryStr));
+
+//         // const allProducts = await Product.find(queryObj);
+
+//         // sorting
+
+//         if (req.query.sort) {
+
+//             const sortBy = req.query.sort.split(",").join(" ");
+
+//             query = query.sort(sortBy);
+
+//         } else {
+
+//             query = query.sort("-createdAt");
+
+//         }
+
+//         // limiting the fields
+
+//         if (req.query.fields) {
+
+//             const fields = req.query.fields.split(",").join(" ");
+
+//             query = query.select(fields);
+
+//         } else {
+
+//             query = query.select('-__v');
+
+//         }
+
+//         // pagination
+
+//         const page = req.query.page;
+//         const limit = req.query.limit;
+//         const skip = (page - 1) * limit;
+
+//         query = query.skip(skip).limit(limit);
+
+//         if (req.query.page) {
+
+//             const productCount = await Product.countDocuments();
+
+//             if (skip >= productCount) {
+
+//                 throw new Error("This Page does not exists");
+//             }
+//         }
+
+//         console.log(page, limit, skip);
+
+//         const product = await query;
+
+//         res.json(product);
+
+//     } catch (error) {
+
+//         throw new Error(error);
+//     }
+// });
+
 const getAllProducts = asyncHandler(async (req, res) => {
 
     try {
+        const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
+        const limit = Math.max(1, parseInt(req.query.limit, 10)) || 50;
+        const sortBy = req.query.sortBy || 'createdAt';
+        const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
-        console.log('req.query: ', req.query);
-
-        // const allProducts = await Product.find(req.query);
-
-        // const allProducts = await Product.find({
-        //     brand: req.query.brand,
-        //     category: req.query.category
-        // });
-
-        const queryObj = { ...req.query };
-
-        const excludeFields = ["page", "sort", "limit", "fields"];
-
-        excludeFields.forEach((el) => delete queryObj[el]);
-
-        console.log('query obj: ', queryObj, excludeFields);
-
-        // const allProducts = await Product.where("category").equals(
-        //     req.query.category
-        // );
-
-        console.log('queryObj ---------> ', queryObj);
-
-        let queryStr = JSON.stringify(queryObj);
-        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-        // console.log('queryStr: ', JSON.parse(queryStr));
-
-        let query = Product.find(JSON.parse(queryStr));
-
-        // const allProducts = await Product.find(queryObj);
-
-        // sorting
-
-        if (req.query.sort) {
-
-            const sortBy = req.query.sort.split(",").join(" ");
-
-            query = query.sort(sortBy);
-
-        } else {
-
-            query = query.sort("-createdAt");
-
+        const filters = req.query.filters ? decodeURIComponent(req.query.filters) : '{}';
+        let parsedFilters = {};
+        try {
+            parsedFilters = JSON.parse(filters);
+        } catch (e) {
+            return res.status(400).json({ message: 'Invalid filters format' });
         }
 
-        // limiting the fields
+        console.log('Filters Parameter:', req.query.filters);
+        console.log('Decoded Filters:', filters);
+        console.log('Parsed Filters Object:', parsedFilters);
 
-        if (req.query.fields) {
-
-            const fields = req.query.fields.split(",").join(" ");
-
-            query = query.select(fields);
-
-        } else {
-
-            query = query.select('-__v');
-
-        }
-
-        // pagination
-
-        const page = req.query.page;
-        const limit = req.query.limit;
         const skip = (page - 1) * limit;
+        const filterCriteria = {};
 
-        query = query.skip(skip).limit(limit);
+        // Apply filters based on matchMode
+        for (const key in parsedFilters) {
+            if (Object.hasOwnProperty.call(parsedFilters, key)) {
+                const { value, matchMode } = parsedFilters[key];
 
-        if (req.query.page) {
+                if (value !== null && value !== '') {
+                    if (key === 'price' || key === 'quantity' || key === 'sold') {
 
-            const productCount = await Product.countDocuments();
+                        const parsedValue = value.toString();
 
-            if (skip >= productCount) {
-
-                throw new Error("This Page does not exists");
+                        switch (matchMode) {
+                            case 'equals':
+                                filterCriteria[key] = parsedValue;
+                                break;
+                            case 'greaterThan':
+                                filterCriteria[key] = { $gt: parsedValue };
+                                break;
+                            case 'lessThan':
+                                filterCriteria[key] = { $lt: parsedValue };
+                                break;
+                            case 'greaterThanOrEqual':
+                                filterCriteria[key] = { $gte: parsedValue };
+                                break;
+                            case 'lessThanOrEqual':
+                                filterCriteria[key] = { $lte: parsedValue };
+                                break;
+                            default:
+                                console.warn(`Unsupported matchMode for numeric field: ${matchMode}`);
+                                break;
+                        }
+                    } else {
+                        switch (matchMode) {
+                            case 'equals':
+                                filterCriteria[key] = value;
+                                break;
+                            case 'startsWith':
+                                filterCriteria[key] = { $regex: `^${value}`, $options: 'i' };
+                                break;
+                            case 'contains':
+                                filterCriteria[key] = { $regex: value, $options: 'i' };
+                                break;
+                            case 'notEquals':
+                                filterCriteria[key] = { $ne: value };
+                                break;
+                            case 'endsWith':
+                                filterCriteria[key] = { $regex: `${value}$`, $options: 'i' };
+                                break;
+                            default:
+                                console.warn(`Unsupported matchMode: ${matchMode}`);
+                                break;
+                        }
+                    }
+                }
             }
         }
 
-        console.log(page, limit, skip);
+        console.log('Final Filter Criteria:', filterCriteria);
 
-        const product = await query;
+        const products = await Product.find(filterCriteria)
+            .sort({ [sortBy]: sortOrder })
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
-        res.json(product);
+        console.log('Fetched Products:', products);
+
+        const totalRecords = await Product.countDocuments(filterCriteria);
+
+        res.json({
+            data: products,
+            totalRecords,
+            page,
+            limit,
+        });
 
     } catch (error) {
-
-        throw new Error(error);
+        console.error('Error fetching products:', error.message);
+        res.status(500).json({ message: 'Server error, please try again later.' });
     }
 });
 
