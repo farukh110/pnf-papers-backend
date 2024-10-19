@@ -791,12 +791,15 @@ const createOrder = asyncHandler(async (req, res) => {
 
 const getOrders = asyncHandler(async (req, res) => {
 
+    const { _id } = req.user;
+    validateMongoDBId(_id);
+
     try {
 
-        const { _id } = req.user;
-        validateMongoDBId(_id);
-
-        const ordersOfUser = await Order.findOne({ orderBy: _id }).populate("products.product").exec();
+        const ordersOfUser = await Order.findOne({ orderBy: _id })
+            .populate("products.product")
+            .populate("orderby")
+            .exec();
 
         res.json(ordersOfUser);
 
