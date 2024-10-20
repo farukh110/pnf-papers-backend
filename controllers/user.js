@@ -791,23 +791,30 @@ const createOrder = asyncHandler(async (req, res) => {
 
 const getOrders = asyncHandler(async (req, res) => {
 
-    const { _id } = req.user;
+    const { _id, role } = req.user;
     validateMongoDBId(_id);
 
     try {
+        let orders;
 
-        const ordersOfUser = await Order.findOne({ orderBy: _id })
-            .populate("products.product")
-            .populate("orderBy")
-            .exec();
+        if (role === "admin") {
+            // If admin, fetch all orders
+            orders = await Order.find()
+                .populate("products.product")
+                .populate("orderBy")
+                .exec();
+        } else {
+            orders = await Order.findOne({ orderBy: _id })
+                .populate("products.product")
+                .populate("orderBy")
+                .exec();
+        }
 
-        res.json(ordersOfUser);
+        res.json(orders);
 
     } catch (error) {
-
         throw new Error(error);
     }
-
 });
 
 // update order status
