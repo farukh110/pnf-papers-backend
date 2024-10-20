@@ -789,6 +789,34 @@ const createOrder = asyncHandler(async (req, res) => {
 
 // get orders
 
+// const getOrders = asyncHandler(async (req, res) => {
+
+//     const { _id, role } = req.user;
+//     validateMongoDBId(_id);
+
+//     try {
+//         let orders;
+
+//         if (role === "admin") {
+//             // If admin, fetch all orders
+//             orders = await Order.find()
+//                 .populate("products.product")
+//                 .populate("orderBy")
+//                 .exec();
+//         } else {
+//             orders = await Order.findOne({ orderBy: _id })
+//                 .populate("products.product")
+//                 .populate("orderBy")
+//                 .exec();
+//         }
+
+//         res.json(orders);
+
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
 const getOrders = asyncHandler(async (req, res) => {
 
     const { _id } = req.user;
@@ -802,6 +830,26 @@ const getOrders = asyncHandler(async (req, res) => {
             .exec();
 
         res.json(ordersOfUser);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// get all orders
+
+const getAllOrders = asyncHandler(async (req, res) => {
+
+    try {
+
+        const allUserOrders = await Order.find()
+            .populate("products.product")
+            .populate("orderBy")
+            .exec();
+
+        res.json(allUserOrders);
 
     } catch (error) {
 
@@ -838,4 +886,4 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus };
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders };
