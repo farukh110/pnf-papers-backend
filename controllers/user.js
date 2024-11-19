@@ -922,10 +922,26 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
         console.log('Final Filter Criteria:', filterCriteria);
 
-        const allUserOrders = await Order.find()
+        // const allUserOrders = await Order.find()
+        //     .populate("products.product")
+        //     .populate("orderBy")
+        //     .exec();
+
+        const allUserOrders = await Order.find(filterCriteria)
             .populate("products.product")
             .populate("orderBy")
+            .sort({ [sortBy]: sortOrder })
+            .skip(skip)
+            .limit(limit)
+            .lean()
             .exec();
+
+        // const products = await Product.find(filterCriteria)
+        //     .sort({ [sortBy]: sortOrder })
+        //     .skip(skip)
+        //     .limit(limit)
+        //     .lean();
+
 
         console.log('Fetched all User Orders:', allUserOrders);
 
