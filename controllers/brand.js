@@ -59,22 +59,22 @@ const deleteBrand = asyncHandler(async (req, res) => {
     }
 })
 
-// get all brands
+// get all brands option
 
-// const getAllBrands = asyncHandler(async (req, res) => {
+const getAllBrandsOption = asyncHandler(async (req, res) => {
 
-//     try {
+    try {
 
-//         const brands = await Brand.find();
+        const brands = await Brand.find();
 
-//         res.json(brands);
+        res.json(brands);
 
-//     } catch (error) {
+    } catch (error) {
 
-//         throw new Error(error);
-//     }
+        throw new Error(error);
+    }
 
-// });
+});
 
 const getAllBrands = asyncHandler(async (req, res) => {
 
@@ -179,4 +179,4 @@ const getBrand = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createBrand, updateBrand, deleteBrand, getAllBrands, getBrand };
+module.exports = { createBrand, updateBrand, deleteBrand, getAllBrands, getBrand, getAllBrandsOption };
