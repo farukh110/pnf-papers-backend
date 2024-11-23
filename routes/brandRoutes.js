@@ -1,6 +1,6 @@
 const express = require('express');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
-const { createBrand, updateBrand, deleteBrand, getAllBrands, getBrand } = require('../controllers/brand');
+const { createBrand, updateBrand, deleteBrand, getAllBrands, getBrand, getAllBrandsOption } = require('../controllers/brand');
 const router = express.Router();
 
 // create brand
@@ -14,6 +14,11 @@ router.put('/:id', authMiddleware, isAdmin, updateBrand);
 // delete brand
 
 router.delete('/:id', authMiddleware, isAdmin, deleteBrand);
+
+// get all brands option
+
+router.get('/options', getAllBrandsOption);
+
 
 // get all brands
 
