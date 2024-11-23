@@ -81,21 +81,23 @@ const getCategory = asyncHandler(async (req, res) => {
 
 });
 
-// get all categories
+// get all categories option
 
-// const getAllCategories = asyncHandler(async (req, res) => {
+const getAllCategoryOption = asyncHandler(async (req, res) => {
 
-//     try {
+    try {
 
-//         const categories = await Category.find();
+        const categories = await Category.find();
 
-//         res.json(categories);
+        console.log('categories: ', categories);
 
-//     } catch (error) {
+        res.json(categories);
 
-//         throw new Error(error);
-//     }
-// });
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
 
 const getAllCategories = asyncHandler(async (req, res) => {
 
@@ -179,4 +181,4 @@ const getAllCategories = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createCategory, updateCategory, deleteCategory, getCategory, getAllCategories };
+module.exports = { createCategory, updateCategory, deleteCategory, getCategory, getAllCategories, getAllCategoryOption };
