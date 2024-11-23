@@ -942,7 +942,6 @@ const getAllOrders = asyncHandler(async (req, res) => {
         //     .limit(limit)
         //     .lean();
 
-
         console.log('Fetched all User Orders:', allUserOrders);
 
         const totalRecords = await Order.countDocuments(filterCriteria);
