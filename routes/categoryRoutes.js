@@ -1,5 +1,5 @@
 const express = require('express');
-const { createCategory, updateCategory, deleteCategory, getCategory, getAllCategories } = require('../controllers/category');
+const { createCategory, updateCategory, deleteCategory, getCategory, getAllCategories, getAllCategoryOption } = require('../controllers/category');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -18,6 +18,10 @@ router.delete('/:id', authMiddleware, isAdmin, deleteCategory);
 // get category
 
 router.get('/:id', getCategory);
+
+// get all category option
+
+router.get('/options', getAllCategoryOption);
 
 // get all categories
 
