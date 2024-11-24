@@ -1,5 +1,5 @@
 const express = require('express');
-const { createColor, updateColor, deleteColor, getAllColors, getColor } = require('../controllers/color');
+const { createColor, updateColor, deleteColor, getAllColors, getColor, getAllColorsOption } = require('../controllers/color');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -14,6 +14,10 @@ router.put('/:id', authMiddleware, isAdmin, updateColor);
 // delete color
 
 router.delete('/:id', authMiddleware, isAdmin, deleteColor);
+
+// get all colors option
+
+router.get('/options', getAllColorsOption);
 
 // get all color
 

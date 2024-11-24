@@ -61,19 +61,19 @@ const deleteColor = asyncHandler(async (req, res) => {
 
 // get all colors
 
-// const getAllColors = asyncHandler(async (req, res) => {
+const getAllColorsOption = asyncHandler(async (req, res) => {
 
-//     try {
+    try {
 
-//         const colors = await Color.find();
+        const colors = await Color.find();
 
-//         res.json(colors);
+        res.json(colors);
 
-//     } catch (error) {
+    } catch (error) {
 
-//         throw new Error(error);
-//     }
-// });
+        throw new Error(error);
+    }
+});
 
 const getAllColors = asyncHandler(async (req, res) => {
 
@@ -177,4 +177,4 @@ const getColor = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createColor, updateColor, deleteColor, getAllColors, getColor };
+module.exports = { createColor, updateColor, deleteColor, getAllColors, getColor, getAllColorsOption };
