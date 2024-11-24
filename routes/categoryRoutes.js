@@ -15,10 +15,6 @@ router.put('/:id', authMiddleware, isAdmin, updateCategory);
 
 router.delete('/:id', authMiddleware, isAdmin, deleteCategory);
 
-// get category
-
-router.get('/:id', getCategory);
-
 // get all category option
 
 router.get('/options', getAllCategoryOption);
@@ -26,5 +22,9 @@ router.get('/options', getAllCategoryOption);
 // get all categories
 
 router.get('/', getAllCategories);
+
+// get category
+
+router.get('/:id', getCategory);
 
 module.exports = router;

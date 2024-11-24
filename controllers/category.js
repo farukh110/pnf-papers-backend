@@ -181,4 +181,4 @@ const getAllCategories = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createCategory, updateCategory, deleteCategory, getCategory, getAllCategories, getAllCategoryOption };
+module.exports = { createCategory, updateCategory, deleteCategory, getCategory, getAllCategoryOption, getAllCategories };
