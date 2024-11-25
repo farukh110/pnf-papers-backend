@@ -2,8 +2,6 @@ const Product = require('../models/product');
 const asyncHandler = require('express-async-handler');
 const slugify = require('slugify');
 const User = require('../models/user');
-const { cloudinaryUploadImage, cloudinaryDeleteImage } = require('../utilities/cloudinary');
-const fs = require('fs');
 
 // create product
 
@@ -410,4 +408,4 @@ const productRating = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addToWishList, productRating, uploadImages, deleteImages };
+module.exports = { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addToWishList, productRating };
