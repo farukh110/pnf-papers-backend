@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addToWishList, productRating, uploadImages, deleteImages } = require('../controllers/product');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const { uploadPhoto, productImageResize } = require('../middlewares/uploadImages');
+const { uploadImages, deleteImages } = require('../controllers/upload');
 
 // upload product images
 

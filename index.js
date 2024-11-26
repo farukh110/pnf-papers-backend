@@ -19,6 +19,7 @@ const colorRouter = require('./routes/colorRoutes');
 const enquiryRouter = require('./routes/enquiryRoutes');
 const countrRouter = require('./routes/countryRoutes');
 const cityRouter = require('./routes/cityRoutes');
+const uploadRouter = require('./routes/uploadRoutes');
 
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -47,6 +48,7 @@ app.use('/api/color', colorRouter);
 app.use('/api/enquiry', enquiryRouter);
 app.use('/api/country', countrRouter);
 app.use('/api/city', cityRouter);
+app.use('/api/upload', uploadRouter);
 
 app.use(notFound);
 app.use(errorHandler);
