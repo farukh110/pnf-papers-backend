@@ -46,9 +46,9 @@ app.use('/api/brand', brandRouter);
 app.use('/api/coupon', couponRouter);
 app.use('/api/color', colorRouter);
 app.use('/api/enquiry', enquiryRouter);
+app.use('/api/upload', uploadRouter);
 app.use('/api/country', countrRouter);
 app.use('/api/city', cityRouter);
-app.use('/api/upload', uploadRouter);
 
 app.use(notFound);
 app.use(errorHandler);
