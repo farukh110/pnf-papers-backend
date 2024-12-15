@@ -48,7 +48,12 @@ const productSchema = Schema({
         required: true,
         // select: false
     },
-    images: [],
+    images: [
+        {
+            public_id: String,
+            url: String
+        }
+    ],
     // color: {
     //     type: String,
     //     enum: ["#A3A3A5", "#C1C1C3", "#787578"]
