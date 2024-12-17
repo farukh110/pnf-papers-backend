@@ -63,7 +63,8 @@ const productSchema = Schema({
     //     required: true
     // },
     color: [],
-    tags: [],
+    // tags: [],
+    tags: String,
     ratings: [
         {
             star: Number,
