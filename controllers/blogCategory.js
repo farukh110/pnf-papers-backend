@@ -197,4 +197,21 @@ const getAllBlogCategories = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createBlogCategory, updateBlogCategory, deleteBlogCategory, getBlogCategory, getAllBlogCategories };
+// get all blog categories options
+
+const getAllBlogCategoriesOptions = asyncHandler(async (req, res) => {
+
+    try {
+
+        const blogCategories = await BlogCategory.find();
+
+        res.json(blogCategories);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
+
+
+module.exports = { createBlogCategory, updateBlogCategory, deleteBlogCategory, getBlogCategory, getAllBlogCategories, getAllBlogCategoriesOptions };
