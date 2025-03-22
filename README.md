@@ -7,10 +7,10 @@ The **PNF Papers Backend API** is the core service powering the PNF Papers e-com
 
 | Technology | Description |
 |------------|-------------|
-| [![Node.js](https://img.shields.io/badge/Node.js-JavaScript-green?logo=node.js)](https://nodejs.org/) | [Runtime environment for JavaScript](https://nodejs.org/) |
-| [![Express.js](https://img.shields.io/badge/Express.js-Backend-lightgrey?logo=express)](https://expressjs.com/) | [Minimal and fast Node.js web framework](https://expressjs.com/) |
-| [![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-database-green?logo=mongodb)](https://www.mongodb.com/) | [Flexible and scalable NoSQL database](https://www.mongodb.com/) |
-| [![Mongoose](https://img.shields.io/badge/Mongoose-ODM-red?logo=mongoose)](https://mongoosejs.com/) | [Elegant MongoDB object modeling for Node.js](https://mongoosejs.com/) |
+| ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white) | [Runtime environment for JavaScript](https://nodejs.org/) |
+| ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) | [Minimal and fast Node.js web framework](https://expressjs.com/) |
+| ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white) | [Flexible and scalable NoSQL database](https://www.mongodb.com/) |
+| ![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white) | [Elegant MongoDB object modeling for Node.js](https://mongoosejs.com/) |
 
 ---
 
@@ -96,4 +96,4 @@ This project is licensed under the **MIT License**.
 ## 📞 Contact  
 📧 Email: [farukhsajjad110@gmail.com](mailto:farukhsajjad110@gmail.com)  
 <!-- 🌐 Website: [www.pnfpapers.com](https://www.pnfpapers.com)  -->
-📱 Phone: [+92341-4285511](tel:+923414285511)
+📱 Phone: [+923414285511](tel:+923414285511)
