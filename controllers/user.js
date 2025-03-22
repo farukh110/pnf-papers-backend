@@ -961,6 +961,29 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
 });
 
+// get order by user id
+
+const getOrderByUserId = asyncHandler(async (req, res) => {
+
+    const { id } = req.user;
+    validateMongoDBId(id);
+
+    try {
+
+        const ordersOfUser = await Order.findOne({ orderBy: _id })
+            .populate("products.product")
+            .populate("orderBy")
+            .exec();
+
+        res.json(ordersOfUser);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
 // update order status
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
@@ -989,4 +1012,4 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders };
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId };
