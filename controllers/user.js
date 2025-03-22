@@ -965,12 +965,12 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
 const getOrderByUserId = asyncHandler(async (req, res) => {
 
-    const { id } = req.user;
+    const { id } = req.params;
     validateMongoDBId(id);
 
     try {
 
-        const ordersOfUser = await Order.findOne({ orderBy: _id })
+        const ordersOfUser = await Order.findOne({ orderBy: id })
             .populate("products.product")
             .populate("orderBy")
             .exec();
