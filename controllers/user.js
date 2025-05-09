@@ -571,57 +571,85 @@ const saveUserAddress = asyncHandler(async (req, res) => {
 
 // add to cart
 
+// const cartUser = asyncHandler(async (req, res) => {
+
+//     try {
+
+//         const { cart } = req.body;
+//         const { _id } = req.user;
+
+//         validateMongoDBId(_id);
+
+//         const user = await User.findById(_id);
+
+//         const products = [];
+
+//         const alreadyExistsCart = await Cart.findOne({ orderBy: user._id });
+
+//         if (alreadyExistsCart) {
+//             alreadyExistsCart.remove();
+//         }
+
+//         for (let i = 0; i < cart.length; i++) {
+
+//             let object = {};
+
+//             object.product = cart[i]._id;
+//             object.count = cart[i].count;
+//             object.color = cart[i].color;
+
+//             let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+//             object.price = getPrice.price;
+
+//             products.push(object);
+
+//         }
+
+//         let cartTotal = 0;
+
+//         for (let i = 0; i < products.length; i++) {
+
+//             cartTotal = cartTotal + products[i].price * products[i].count;
+
+//         }
+
+//         console.log('products: ', products);
+
+//         console.log(products, cartTotal);
+
+//         let newCartItem = await new Cart({
+
+//             products,
+//             cartTotal,
+//             orderBy: user?._id
+
+//         }).save();
+
+//         res.json(newCartItem);
+
+//     } catch (error) {
+
+//         throw new Error(error);
+//     }
+
+// });
+
 const cartUser = asyncHandler(async (req, res) => {
 
     try {
 
-        const { cart } = req.body;
+        const { productId, color, quantity, price } = req.body;
         const { _id } = req.user;
 
         validateMongoDBId(_id);
 
-        const user = await User.findById(_id);
-
-        const products = [];
-
-        const alreadyExistsCart = await Cart.findOne({ orderBy: user._id });
-
-        if (alreadyExistsCart) {
-            alreadyExistsCart.remove();
-        }
-
-        for (let i = 0; i < cart.length; i++) {
-
-            let object = {};
-
-            object.product = cart[i]._id;
-            object.count = cart[i].count;
-            object.color = cart[i].color;
-
-            let getPrice = await Product.findById(cart[i]._id).select("price").exec();
-            object.price = getPrice.price;
-
-            products.push(object);
-
-        }
-
-        let cartTotal = 0;
-
-        for (let i = 0; i < products.length; i++) {
-
-            cartTotal = cartTotal + products[i].price * products[i].count;
-
-        }
-
-        console.log('products: ', products);
-
-        console.log(products, cartTotal);
-
         let newCartItem = await new Cart({
 
-            products,
-            cartTotal,
-            orderBy: user?._id
+            userId: _id,
+            productId,
+            color,
+            price,
+            quantity
 
         }).save();
 
