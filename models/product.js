@@ -62,8 +62,8 @@ const productSchema = Schema({
     //     type: String,
     //     required: true
     // },
-    color: [],
-    // color: [{ type: Schema.Types.ObjectId, ref: "Color" }],
+    // color: [],
+    color: [{ type: Schema.Types.ObjectId, ref: "Color" }],
     // tags: [],
     tags: String,
     ratings: [
