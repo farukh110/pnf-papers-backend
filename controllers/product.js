@@ -77,6 +77,7 @@ const getProduct = asyncHandler(async (req, res) => {
 
         const findProduct = await Product.findById(id);
 
+
         res.json(findProduct);
 
     } catch (error) {
