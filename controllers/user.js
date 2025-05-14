@@ -682,6 +682,51 @@ const getUserCart = asyncHandler(async (req, res) => {
 
 });
 
+// remove product from cart
+
+const removeProductFromCart = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+        const { cartItemId } = req.params;
+        validateMongoDBId(_id);
+
+        const deleteProduct = await Cart.deleteOne({ userId: _id, _id: cartItemId });
+
+        res.json(deleteProduct);
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+
+});
+
+// update product quantity from cart 
+
+const updateProductQuantity = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+        const { cartItemId, newQuantity } = req.params;
+
+        console.log('cartItemId: ', cartItemId);
+
+        validateMongoDBId(_id);
+
+        const cartItem = await Cart.findOne({ userId: _id, _id: cartItemId });
+        cartItem.quantity = newQuantity;
+        cartItem.save();
+        res.json(cartItem);
+
+    } catch (error) {
+        throw new Error(error);
+    }
+
+});
+
 // empty cart user
 
 const emptyUserCart = asyncHandler(async (req, res) => {
@@ -1040,4 +1085,4 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId };
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, removeProductFromCart, updateProductQuantity, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId };
