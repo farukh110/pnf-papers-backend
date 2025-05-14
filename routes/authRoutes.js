@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId } = require('../controllers/user');
+const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, removeProductFromCart, updateProductQuantity } = require('../controllers/user');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -62,6 +62,12 @@ router.get('/:id', authMiddleware, isAdmin, getUser);
 
 // empty user cart
 router.delete('/empty-cart', authMiddleware, emptyUserCart);
+
+// remove product from cart
+router.delete('/delete-product-cart/:cartItemId', authMiddleware, removeProductFromCart);
+
+// update product quantity
+router.put('/update-product-cart/:cartItemId/:newQuantity', authMiddleware, updateProductQuantity);
 
 // delete single user
 router.delete('/:id', deleteUser);
