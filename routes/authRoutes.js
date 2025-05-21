@@ -66,9 +66,6 @@ router.delete('/empty-cart', authMiddleware, emptyUserCart);
 // remove product from cart
 router.delete('/delete-product-cart/:cartItemId', authMiddleware, removeProductFromCart);
 
-// update product quantity
-router.put('/update-product-cart/:cartItemId/:newQuantity', authMiddleware, updateProductQuantity);
-
 // delete single user
 router.delete('/:id', deleteUser);
 
@@ -83,5 +80,8 @@ router.put('/block-user/:id', authMiddleware, isAdmin, blockUser);
 
 // unblock user
 router.put('/unblock-user/:id', authMiddleware, isAdmin, unblockUser);
+
+// update product quantity
+router.delete('/update-product-cart/:cartItemId/:newQuantity', authMiddleware, updateProductQuantity);
 
 module.exports = router;
