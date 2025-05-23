@@ -797,68 +797,68 @@ const applyCoupon = asyncHandler(async (req, res) => {
 
 // create order
 
-const createOrder = asyncHandler(async (req, res) => {
+// const createOrder = asyncHandler(async (req, res) => {
 
-    try {
+//     try {
 
-        const { _id } = req.user;
-        const { COD, couponApplied } = req.body;
+//         const { _id } = req.user;
+//         const { COD, couponApplied } = req.body;
 
-        validateMongoDBId(_id);
+//         validateMongoDBId(_id);
 
-        if (!COD) throw new Error("Create Cash Order Failed");
+//         if (!COD) throw new Error("Create Cash Order Failed");
 
-        const user = await User.findById(_id);
+//         const user = await User.findById(_id);
 
-        let cartUser = await Cart.findOne({ orderBy: user._id });
+//         let cartUser = await Cart.findOne({ orderBy: user._id });
 
-        let amount = 0;
+//         let amount = 0;
 
-        if (couponApplied && cartUser.totalAfterDiscount) {
+//         if (couponApplied && cartUser.totalAfterDiscount) {
 
-            amount = cartUser.totalAfterDiscount;
+//             amount = cartUser.totalAfterDiscount;
 
-        } else {
+//         } else {
 
-            amount = cartUser.cartTotal;
-        }
+//             amount = cartUser.cartTotal;
+//         }
 
-        let newOrder = await new Order({
+//         let newOrder = await new Order({
 
-            products: cartUser.products,
-            paymentIntent: {
+//             products: cartUser.products,
+//             paymentIntent: {
 
-                id: uniqid(),
-                method: "COD",
-                amount: amount,
-                status: "Cash on Delivery",
-                currency: "pkr"
+//                 id: uniqid(),
+//                 method: "COD",
+//                 amount: amount,
+//                 status: "Cash on Delivery",
+//                 currency: "pkr"
 
-            },
-            orderBy: user._id,
-            orderStatus: "Cash on Delivery"
+//             },
+//             orderBy: user._id,
+//             orderStatus: "Cash on Delivery"
 
-        }).save();
+//         }).save();
 
-        let update = cartUser.products.map((item) => {
+//         let update = cartUser.products.map((item) => {
 
-            return {
-                updateOne: {
-                    filter: { _id: item.product._id },
-                    update: { $inc: { quantity: -item.count, sold: +item.count } }
-                }
-            }
-        });
+//             return {
+//                 updateOne: {
+//                     filter: { _id: item.product._id },
+//                     update: { $inc: { quantity: -item.count, sold: +item.count } }
+//                 }
+//             }
+//         });
 
-        const updatedOrder = await Product.bulkWrite(update, {});
+//         const updatedOrder = await Product.bulkWrite(update, {});
 
-        res.json({ message: "success" });
+//         res.json({ message: "success" });
 
-    } catch (error) {
+//     } catch (error) {
 
-        throw new Error(error);
-    }
-});
+//         throw new Error(error);
+//     }
+// });
 
 // get orders
 
@@ -889,6 +889,29 @@ const createOrder = asyncHandler(async (req, res) => {
 //         throw new Error(error);
 //     }
 // });
+
+const createOrder = asyncHandler(async (req, res) => {
+
+    const { shippingInfo, orderItems, totalPrice, totalPriceAfterDiscount, paymentInfo } = req.body;
+
+    const { _id } = req.user;
+
+    try {
+
+        const order = await Order.create({
+            shippingInfo, orderItems, totalPrice, totalPriceAfterDiscount, paymentInfo, user: _id
+        })
+
+        res.json({
+            order,
+            success: true
+        })
+
+    } catch (error) {
+        throw new Error(error);
+    }
+
+});
 
 const getOrders = asyncHandler(async (req, res) => {
 
