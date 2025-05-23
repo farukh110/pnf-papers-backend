@@ -19,7 +19,7 @@ router.post('/cart', authMiddleware, cartUser);
 router.post('/cart/apply-coupon', authMiddleware, applyCoupon);
 
 // cash order
-router.post('/cart/cash-order', authMiddleware, createOrder);
+router.post('/cart/create-order', authMiddleware, createOrder);
 
 // update password
 router.put('/password', authMiddleware, updatePassword);
