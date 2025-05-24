@@ -1,6 +1,7 @@
 const express = require('express');
 const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, removeProductFromCart, updateProductQuantity } = require('../controllers/user');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
+const { checkout, paymentVerification } = require('../controllers/payment');
 const router = express.Router();
 
 // register user
@@ -14,6 +15,12 @@ router.post('/admin-login', adminLogin);
 
 // cart user
 router.post('/cart', authMiddleware, cartUser);
+
+// checkout
+router.post('/order/checkout', authMiddleware, checkout);
+
+// checkout
+router.post('/order/payment-verification', authMiddleware, paymentVerification);
 
 // cart user
 router.post('/cart/apply-coupon', authMiddleware, applyCoupon);
