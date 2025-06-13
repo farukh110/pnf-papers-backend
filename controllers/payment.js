@@ -1,41 +1,57 @@
-const Razorpay = require('razorpay');
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-const instance = new Razorpay({
-    key_id: "",
-    key_secret: ""
-});
-
-// checkout
-
+// Create PaymentIntent
 const checkout = async (req, res) => {
+    try {
+        const { amount } = req.body;
 
-    const option = {
-        amount: 50000,
-        currency: "PKR"
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount * 100, // Convert dollars to cents
+            currency: 'usd',
+            payment_method_types: ['card'],
+        });
+
+        res.json({
+            success: true,
+            clientSecret: paymentIntent.client_secret,
+        });
+    } catch (error) {
+        console.error('Stripe Error:', error.message);
+        res.status(500).json({ success: false, error: error.message });
     }
-
-    const order = await instance.orders.create(option);
-
-    res.json({
-        success: true,
-        order
-    })
 };
 
-// payment verification
-
+// Verify PaymentIntent
 const paymentVerification = async (req, res) => {
+    try {
+        const { paymentIntentId } = req.body;
 
-    const { razorpayOrderId, razorpayPaymentId } = req.body;
+        if (!paymentIntentId) {
+            return res.status(400).json({ success: false, message: "PaymentIntent ID is required." });
+        }
 
-    res.json({
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-        razorpayOrderId, razorpayPaymentId
-    });
-
+        if (paymentIntent.status === 'succeeded') {
+            res.json({
+                success: true,
+                message: "Payment verified successfully.",
+                paymentIntent,
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: `Payment not completed. Status: ${paymentIntent.status}`,
+            });
+        }
+    } catch (error) {
+        console.error('Stripe Verification Error:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
 };
 
 module.exports = {
     checkout,
-    paymentVerification
-}
+    paymentVerification,
+};
