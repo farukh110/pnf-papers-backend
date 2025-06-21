@@ -472,10 +472,14 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 
         const token = await user.createPasswordResetToken();
 
+        if (Array.isArray(user.address)) {
+            user.address = '';
+        }
+
         await user.save();
 
         const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. 
-        <a href='http://localhost:5000/api/user/reset-password/${token}'> click here </a>`;
+        <a href='http://localhost:5173/reset-password/${token}'> click here </a>`;
 
         const data = {
 
@@ -1108,4 +1112,24 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, removeProductFromCart, updateProductQuantity, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId };
+// get my orders
+
+const getMyOrders = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+
+        const orders = await Order.find({ user: _id }).populate("user").populate("orderItems.product").populate("orderItems.color");
+
+        res.json({
+            orders
+        });
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
+
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, removeProductFromCart, updateProductQuantity, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, getMyOrders };
