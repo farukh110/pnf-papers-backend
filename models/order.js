@@ -57,7 +57,7 @@ const orderSchema = Schema({
         },
         other: {
             type: String,
-            required: true
+            required: false
         },
         pincode: {
             type: Number,
@@ -65,11 +65,15 @@ const orderSchema = Schema({
         }
     },
     paymentInfo: {
-        razorpayOrderId: {
+        id: {
             type: String,
             required: true
         },
-        razorpayPaymentId: {
+        status: {
+            type: String,
+            required: true
+        },
+        method: {
             type: String,
             required: true
         }
