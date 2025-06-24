@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
+const Color = require('../models/color');
 const Coupon = require('../models/coupon');
 const uniqid = require('uniqid');
 const asyncHandler = require('express-async-handler');
@@ -913,6 +914,8 @@ const createOrder = asyncHandler(async (req, res) => {
 
 });
 
+// get orders
+
 const getOrders = asyncHandler(async (req, res) => {
 
     const { _id } = req.user;
@@ -934,12 +937,48 @@ const getOrders = asyncHandler(async (req, res) => {
 
 });
 
-// get all orders
+// get order
 
-const getAllOrders = asyncHandler(async (req, res) => {
+const getOrder = asyncHandler(async (req, res) => {
 
     try {
 
+        const { id } = req.params;
+        const order = await Order.findOne({ _id: id }).populate("orderItems.product").populate("orderItems.color");
+
+        res.json({
+            order
+        });
+
+    } catch (error) {
+
+        throw new Error(error);
+    }
+});
+
+// update order
+
+const updateOrder = asyncHandler(async (req, res) => {
+
+    try {
+        const { id } = req.params;
+
+        const order = await Order.findByIdAndUpdate(
+            id,
+            { orderStatus: req.body.status },
+            { new: true, runValidators: false }
+        );
+
+        res.json({ order });
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+// get all orders
+
+const getAllOrders = asyncHandler(async (req, res) => {
+    try {
         const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
         const limit = Math.max(1, parseInt(req.query.limit, 10)) || 50;
         const sortBy = req.query.sortBy || 'createdAt';
@@ -960,56 +999,27 @@ const getAllOrders = asyncHandler(async (req, res) => {
         const skip = (page - 1) * limit;
         const filterCriteria = {};
 
-        // Apply filters based on matchMode
         for (const key in parsedFilters) {
             if (Object.hasOwnProperty.call(parsedFilters, key)) {
                 const { value, matchMode } = parsedFilters[key];
 
                 if (value !== null && value !== '') {
-                    if (key === 'price' || key === 'quantity' || key === 'sold') {
-
-                        const parsedValue = value.toString();
-
+                    if (['price', 'quantity', 'sold'].includes(key)) {
+                        const parsedValue = Number(value);
                         switch (matchMode) {
-                            case 'equals':
-                                filterCriteria[key] = parsedValue;
-                                break;
-                            case 'greaterThan':
-                                filterCriteria[key] = { $gt: parsedValue };
-                                break;
-                            case 'lessThan':
-                                filterCriteria[key] = { $lt: parsedValue };
-                                break;
-                            case 'greaterThanOrEqual':
-                                filterCriteria[key] = { $gte: parsedValue };
-                                break;
-                            case 'lessThanOrEqual':
-                                filterCriteria[key] = { $lte: parsedValue };
-                                break;
-                            default:
-                                console.warn(`Unsupported matchMode for numeric field: ${matchMode}`);
-                                break;
+                            case 'equals': filterCriteria[key] = parsedValue; break;
+                            case 'greaterThan': filterCriteria[key] = { $gt: parsedValue }; break;
+                            case 'lessThan': filterCriteria[key] = { $lt: parsedValue }; break;
+                            case 'greaterThanOrEqual': filterCriteria[key] = { $gte: parsedValue }; break;
+                            case 'lessThanOrEqual': filterCriteria[key] = { $lte: parsedValue }; break;
                         }
                     } else {
                         switch (matchMode) {
-                            case 'equals':
-                                filterCriteria[key] = value;
-                                break;
-                            case 'startsWith':
-                                filterCriteria[key] = { $regex: `^${value}`, $options: 'i' };
-                                break;
-                            case 'contains':
-                                filterCriteria[key] = { $regex: value, $options: 'i' };
-                                break;
-                            case 'notEquals':
-                                filterCriteria[key] = { $ne: value };
-                                break;
-                            case 'endsWith':
-                                filterCriteria[key] = { $regex: `${value}$`, $options: 'i' };
-                                break;
-                            default:
-                                console.warn(`Unsupported matchMode: ${matchMode}`);
-                                break;
+                            case 'equals': filterCriteria[key] = value; break;
+                            case 'startsWith': filterCriteria[key] = { $regex: `^${value}`, $options: 'i' }; break;
+                            case 'contains': filterCriteria[key] = { $regex: value, $options: 'i' }; break;
+                            case 'notEquals': filterCriteria[key] = { $ne: value }; break;
+                            case 'endsWith': filterCriteria[key] = { $regex: `${value}$`, $options: 'i' }; break;
                         }
                     }
                 }
@@ -1018,41 +1028,59 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
         console.log('Final Filter Criteria:', filterCriteria);
 
-        // const allUserOrders = await Order.find()
-        //     .populate("products.product")
-        //     .populate("orderBy")
-        //     .exec();
-
         const allUserOrders = await Order.find(filterCriteria)
-            .populate("products.product")
-            .populate("orderBy")
+            .populate({ path: "user", strictPopulate: false })
+            .populate({ path: "orderBy", strictPopulate: false })
+            .populate({ path: "products.product", model: Product, strictPopulate: false })
+            .populate({ path: "orderItems.product", model: Product, strictPopulate: false })
+            .populate({ path: "orderItems.color", model: Color, strictPopulate: false })
             .sort({ [sortBy]: sortOrder })
             .skip(skip)
             .limit(limit)
             .lean()
             .exec();
 
-        // const products = await Product.find(filterCriteria)
-        //     .sort({ [sortBy]: sortOrder })
-        //     .skip(skip)
-        //     .limit(limit)
-        //     .lean();
+        const normalizedOrders = allUserOrders.map(order => {
+            // If orderBy is missing but user is present, use user as orderBy
+            if (!order.orderBy && order.user && typeof order.user === 'object') {
+                order.orderBy = order.user;
+            }
 
-        console.log('Fetched all User Orders:', allUserOrders);
+            return order;
+        });
 
         const totalRecords = await Order.countDocuments(filterCriteria);
 
         res.json({
-            data: allUserOrders,
+            data: normalizedOrders,
             totalRecords,
             page,
-            limit,
+            limit
+        });
+
+    } catch (error) {
+        console.error('Error fetching all User Orders:', error.message);
+        res.status(500).json({ message: 'Server error, please try again later.' });
+    }
+});
+
+// get all order items
+
+const getAllOrdersItems = asyncHandler(async (req, res) => {
+
+    try {
+
+        const { _id } = req.user;
+
+        const orders = await Order.find({ user: _id });
+
+        res.json({
+            orders
         });
 
     } catch (error) {
 
-        console.error('Error fetching all User Orders:', error.message);
-        res.status(500).json({ message: 'Server error, please try again later.' });
+        throw new Error(error);
     }
 
 });
@@ -1108,4 +1136,130 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, removeProductFromCart, updateProductQuantity, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId };
+// get month wise order income
+
+const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
+
+    let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let d = new Date();
+    let endDate = "";
+
+    d.setDate(1);
+
+    for (let index = 0; index < 11; index++) {
+
+        d.setMonth(d.getMonth() - 1);
+        endDate = monthNames[d.getMonth()] + " " + d.getFullYear();
+
+    }
+
+    console.log('endDate: ', endDate);
+
+    const data = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $lte: new Date(),
+                    $gte: new Date(endDate)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: "$month"
+                },
+                amount: { $sum: "$totalPriceAfterDiscount" },
+                count: { $sum: 1 }
+            }
+        }
+    ])
+
+    res.json(data);
+});
+
+// get month wise order count
+
+const getMonthWiseOrderCount = asyncHandler(async (req, res) => {
+
+    let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let d = new Date();
+    let endDate = "";
+
+    d.setDate(1);
+
+    for (let index = 0; index < 11; index++) {
+
+        d.setMonth(d.getMonth() - 1);
+        endDate = monthNames[d.getMonth()] + " " + d.getFullYear();
+
+    }
+
+    console.log('endDate: ', endDate);
+
+    const data = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $lte: new Date(),
+                    $gte: new Date(endDate)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: "$month"
+                },
+                count: { $sum: 1 }
+            }
+        }
+    ])
+
+    res.json(data);
+});
+
+// get yearly total orders
+
+const getYearlyTotalOrders = asyncHandler(async (req, res) => {
+
+    let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let d = new Date();
+    let endDate = "";
+
+    d.setDate(1);
+
+    for (let index = 0; index < 11; index++) {
+
+        d.setMonth(d.getMonth() - 1);
+        endDate = monthNames[d.getMonth()] + " " + d.getFullYear();
+
+    }
+
+    console.log('endDate: ', endDate);
+
+    const data = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $lte: new Date(),
+                    $gte: new Date(endDate)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                count: { $sum: 1 },
+                amount: { $sum: "$totalPriceAfterDiscount" }
+            }
+        }
+    ])
+
+    res.json(data);
+});
+
+module.exports = { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, removeProductFromCart, updateProductQuantity, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, getMonthWiseOrderIncome, getMonthWiseOrderCount, getYearlyTotalOrders, getAllOrdersItems, getOrder, updateOrder };

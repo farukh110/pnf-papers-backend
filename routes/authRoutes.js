@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, removeProductFromCart, updateProductQuantity } = require('../controllers/user');
+const { createUser, loginUser, getAllUsers, getUser, deleteUser, updateUser, blockUser, unblockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, adminLogin, getWishList, saveUserAddress, cartUser, getUserCart, emptyUserCart, applyCoupon, createOrder, getOrders, updateOrderStatus, getAllOrders, getOrderByUserId, removeProductFromCart, updateProductQuantity, getMonthWiseOrderIncome, getMonthWiseOrderCount, getYearlyTotalOrders, getAllOrdersItems, getOrder, updateOrder } = require('../controllers/user');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const { checkout, paymentVerification } = require('../controllers/payment');
 const router = express.Router();
@@ -49,8 +49,17 @@ router.get('/orders', authMiddleware, getOrders);
 // get all orders
 router.get('/all-orders', authMiddleware, isAdmin, getAllOrders);
 
+// get all orders items
+router.get('/all-orders-items', authMiddleware, isAdmin, getAllOrdersItems);
+
 // get order by user id
-router.post('/order-by-user/:id', authMiddleware, isAdmin, getOrderByUserId);
+router.get('/order-by-user/:id', authMiddleware, isAdmin, getOrderByUserId);
+
+// get order
+router.get('/order/:id', authMiddleware, isAdmin, getOrder);
+
+// update order
+router.put('/update-order/:id', authMiddleware, isAdmin, updateOrder);
 
 // refresh token
 router.get('/refresh', handleRefreshToken);
@@ -63,6 +72,15 @@ router.get('/wishlist', authMiddleware, getWishList);
 
 // get user cart 
 router.get('/cart', authMiddleware, getUserCart);
+
+// get month wise order income 
+router.get('/month-wise-order-income', authMiddleware, getMonthWiseOrderIncome);
+
+// get month wise order count 
+router.get('/month-wise-order-count', authMiddleware, getMonthWiseOrderCount);
+
+// get yearly total orders 
+router.get('/yearly-total-orders', authMiddleware, getYearlyTotalOrders);
 
 // get single user
 router.get('/:id', authMiddleware, isAdmin, getUser);
