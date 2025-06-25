@@ -65,11 +65,15 @@ const orderSchema = Schema({
         }
     },
     paymentInfo: {
-        razorpayOrderId: {
+        id: {
+            type: String,
+            required: true
+        },
+        status: {
             type: String,
             required: false
         },
-        razorpayPaymentId: {
+        method: {
             type: String,
             required: false
         }
