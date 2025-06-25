@@ -19,20 +19,20 @@ const createUser = asyncHandler(async (req, res) => {
 
     const email = req.body.email;
 
-    const findUser = await User.findOne({ email: email });
+    const findUser = await User.findOne({ email });
 
     if (!findUser) {
 
         const newUser = await User.create(req.body);
-        res.json(newUser);
+        res.status(201).json(newUser); // 201 Created
 
     } else {
 
-        // res.json({
-        //     message: "User Already Exists",
-        //     success: false
-        // });
-        throw new Error("User Already Exists");
+        // ✅ Use 409 Conflict for duplicate user
+        return res.status(409).json({
+            message: "User Already Exists",
+            success: false
+        });
     }
 });
 
@@ -738,9 +738,9 @@ const emptyUserCart = asyncHandler(async (req, res) => {
 
         validateMongoDBId(_id);
 
-        const user = await User.findOne({ _id });
+        // const user = await User.findOne({ _id });
 
-        const cart = await Cart.findOneAndDelete({ orderBy: user._id });
+        const cart = await Cart.deleteMany({ userId: _id });
 
         res.json(cart);
 
