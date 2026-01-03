@@ -10,8 +10,8 @@ const dbConnection = () => {
 
     } catch (error) {
 
-        // throw new Error(error);
-        console.log('Error: ', error);
+        throw new Error(error);
+        // console.log('Error: ', error);
     }
 
 };
